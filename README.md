@@ -2,7 +2,7 @@
 An 2025 FYP project by mechatronic student
 
 
--Arduino:robo_car_1
+-Arduino:robo_car_1 (for motor testing)
 	Project_MEC3-25_1
 -Ros: robot_control
 
