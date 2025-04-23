@@ -2,6 +2,7 @@
 
 
 -Arduino: - Demo_robot.ino
+robo_test (testing wiring)
 	
 	
 	
