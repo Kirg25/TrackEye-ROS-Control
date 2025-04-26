@@ -17,12 +17,12 @@ void commandCallback(const std_msgs::String &msg) {
   command = msg.data;
   if (command == "F") {
     shouldMove = true;  // Enable continuous movement
-    digitalWrite(LENA, LOW);  // Enable motors
-    digitalWrite(RENA, LOW);
+    //digitalWrite(LENA, LOW);  // Enable motors
+    //digitalWrite(RENA, LOW);
   } else if (command == "S") {
     shouldMove = false;  // Stop movement
-    digitalWrite(LENA, HIGH);  // Disable motors (optional, can also just stop pulses)
-    digitalWrite(RENA, HIGH);
+    //digitalWrite(LENA, HIGH);  // Disable motors (optional, can also just stop pulses)
+    //digitalWrite(RENA, HIGH);
   }
 }
 
