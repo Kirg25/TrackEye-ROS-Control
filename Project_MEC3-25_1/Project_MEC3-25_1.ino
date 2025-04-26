@@ -41,9 +41,14 @@ void loop() {
   nh.spinOnce();  // Process incoming ROS messages
 
   if (command == "F") {
+    // Re-enable motors when moving forward
+    digitalWrite(LENA, LOW);
+    digitalWrite(RENA, LOW);
     moveForward();
+    command = "";  // Clear command after execution
   } else if (command == "S") {
     stopMotors();
+    command = "";  // Clear command after execution
   }
 }
 
