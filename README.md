@@ -22,4 +22,4 @@ rosrun robot_control send_motor_command.py
 
 Python file not executeable
 
-*chmod +x /home/wafiuddin/catkin_ws/src/robot_control/scripts/send_motor_command.py
+*chmod +x /home/<User>/catkin_ws/src/robot_control/scripts/send_motor_command.py
