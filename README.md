@@ -3,12 +3,12 @@
 An 2025 FYP project by mechatronic student
 
 
-*-Arduino*:robo_car_1 (for motor testing)
-	Project_MEC3-25_1
+*-Arduino*:Project_MEC3-25_2Teleop_control
 
 *-Ros*: robot_control
 
-Running the system
+
+**Running the system**
 
 roscore
 
