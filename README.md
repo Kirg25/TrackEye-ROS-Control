@@ -1,204 +1,127 @@
-# Startup-Application
-
-to start our program on start up automatically
-
-
-
-— your current startup sequence needs three separate commands in separate terminals:
-
-1. **roscore**
-2. **rosserial** to connect Arduino
-3. **keyboard control node**
-
-We can make them all run automatically at boot on Ubuntu 20.04 by creating **one ROS launch file** and then telling `systemd` to start it after boot.
+Got it 👍 You want the **whole project** (roscore + rosserial + your Python node) to run automatically at login using **Startup Applications**, not systemd.
+Let’s redo the setup from scratch, but tailored for **Startup Applications**.
 
 ---
 
-## **Step 1 — Create a unified ROS launch file**
+## **Step 1 — Create a launch file**
 
-Since `roscore` is already started automatically when you run a `.launch` file, you don’t need to start it separately.
-We’ll make `keyboard_motor_control` and `rosserial` start together.
+Since a `.launch` file starts **roscore automatically**, you don’t need a separate terminal for it.
+Put both rosserial and your keyboard node inside it.
 
-1. Go to your ROS package folder, for example:
+1. Go to your package:
 
    ```bash
    cd ~/catkin_ws/src/robot_control/launch
    ```
 
-   *(If you don’t have a `launch` folder, create it.)*
+   *(make the `launch` folder if it doesn’t exist)*
 
-2. Create a new file:
+2. Create a file:
 
    ```bash
    nano auto_start.launch
    ```
 
-3. Add this:
+3. Paste this:
 
    ```xml
    <launch>
-       <!-- Start rosserial to connect Arduino -->
+       <!-- Connect Arduino -->
        <node pkg="rosserial_python" type="serial_node.py" name="rosserial_arduino"
              args="_port:=/dev/ttyACM0 _baud:=57600" output="screen" />
 
-       <!-- Start your keyboard control node -->
+       <!-- Keyboard motor control -->
        <node pkg="robot_control" type="ros_key_control.py" name="keyboard_motor_control" output="screen" />
    </launch>
    ```
 
-4. Save and exit.
+4. Save & exit.
 
----
-
-## **Step 2 — Test the launch file**
+✅ Test it:
 
 ```bash
 roslaunch robot_control auto_start.launch
 ```
 
-If it starts both `rosserial` and your keyboard control node without issues, you’re ready for auto-start.
+This should start everything.
 
 ---
 
-## **Step 3 — Create a startup script**
+## **Step 2 — Create a wrapper script**
 
-1. Create:
+Startup Applications needs a **single executable command**, so we wrap the sourcing + roslaunch in a script.
+
+1. Make a script in your home folder:
 
    ```bash
    nano ~/start_robot.sh
    ```
 
-2. Add:
+2. Add this:
 
    ```bash
    #!/bin/bash
+   # Load ROS environment
    source /opt/ros/noetic/setup.bash
-   source ~/catkin_ws/devel/setup.bash
+   source /home/$USER/catkin_ws/devel/setup.bash
+
+   # Launch your project
    roslaunch robot_control auto_start.launch
    ```
 
-3. Make it executable:
+3. Save & make it executable:
 
    ```bash
    chmod +x ~/start_robot.sh
    ```
 
----
-
-## **Step 4 — Create a systemd service**
-
-1. Create:
-
-   ```bash
-   sudo nano /etc/systemd/system/robot_autostart.service
-   ```
-
-2. Add:
-
-   ```ini
-   [Unit]
-   Description=Robot Arduino + ROS Autostart
-   After=network.target
-
-   [Service]
-   Type=simple
-   User=wafiuddin   # change to your Ubuntu username
-   WorkingDirectory=/home/wafiuddin
-   ExecStart=/home/wafiuddin/start_robot.sh
-   Restart=on-failure
-
-   [Install]
-   WantedBy=multi-user.target
-   ```
-
-3. Save and exit.
-
----
-
-## **Step 5 — Enable & start**
+✅ Test it manually:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable robot_autostart.service
-sudo systemctl start robot_autostart.service
+~/start_robot.sh
 ```
+
+If it works, you’re ready.
 
 ---
 
-## **Step 6 — Check logs if something fails**
+## **Step 3 — Add to Startup Applications**
 
-```bash
-journalctl -u robot_autostart.service -b
-```
+1. Press **Super** (Windows key), search **Startup Applications**, and open it.
+2. Click **Add** → Fill in:
+
+   * **Name:**
+
+     ```
+     Robot Project Autostart
+     ```
+   * **Command:**
+
+     ```
+     gnome-terminal -- bash -c "/home/$USER/start_robot.sh; exec bash"
+     ```
+
+     > This opens your script in a terminal so you can see logs/errors.
+   * **Comment:**
+
+     ```
+     Start ROS, Arduino (rosserial), and keyboard control on login
+     ```
+3. Save.
 
 ---
 
-💡 **Extra tip for Arduino USB**
+## **Step 4 — Reboot and check**
 
-* Sometimes `/dev/ttyACM0` changes after a reboot.
-  You can make it permanent by creating a udev rule so it always appears as `/dev/arduino`:
+* After logging in, a terminal should pop up automatically and run your project.
+* If Arduino sometimes isn’t detected fast enough, you can add a short delay to your script:
 
   ```bash
-  sudo nano /etc/udev/rules.d/99-arduino.rules
+  sleep 5
   ```
 
-  Add:
-
-  ```
-  SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0043", SYMLINK+="arduino"
-  ```
-
-  *(Vendor/Product IDs depend on your Arduino model — find them with `lsusb`.)*
-  Then in your launch file, replace `/dev/ttyACM0` with `/dev/arduino`.
-
 ---
 
-If you want, I can make you **a single launch file that starts roscore, rosserial, and keyboard control** and also **waits until Arduino is connected** so it won’t crash during boot. That makes it fully hands-off — you just turn on your PC and it’s ready.
+✨ Done — now every time you log in, your ROS project (roscore + rosserial + keyboard control) runs automatically.
 
-Do you want me to make that version?
-
-
-
-You *can* put just
-
-```bash
-roslaunch robot_control auto_start.launch
-```
-
-in the **Startup Applications** command field —
-but it won’t work unless you also load your **ROS environment variables** first.
-
----
-
-When you run `roslaunch` in a normal terminal, you already did something like:
-
-```bash
-source /opt/ros/noetic/setup.bash
-source ~/catkin_ws/devel/setup.bash
-```
-
-These commands set up things like `ROS_PACKAGE_PATH` and `PYTHONPATH` so `roslaunch` knows where to find your packages.
-
-**Startup Applications** doesn’t automatically run your `.bashrc`, so without `source ...` first, `roslaunch` will fail with errors like:
-
-```
-roslaunch: command not found
-or
-[roslaunch] No package named 'robot_control'
-```
-
----
-
-**That’s why** the working Startup Applications command is usually:
-
-```bash
-bash -c "source /opt/ros/noetic/setup.bash && source /home/$USER/catkin_ws/devel/setup.bash && roslaunch robot_control auto_start.launch"
-```
-
-`bash -c` runs a shell, sources the setup files, and then runs `roslaunch` with your environment ready.
-
----
-
-If you want, I can show you **a shortcut** so you *can* just write `roslaunch robot_control auto_start.launch` and have it still work at startup without typing the sources every time. That involves adding the sources to a small wrapper script.
-
-Do you want me to make that wrapper?
+👉 Do you want me to also make the script open **multiple terminal tabs** (one for roscore, one for rosserial, one for keyboard node) so it looks exactly like how you normally start it manually?
