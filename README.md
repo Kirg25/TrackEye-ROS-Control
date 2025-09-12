@@ -4,7 +4,7 @@ to start our program on start up automatically
 
 
 
-Gotcha — your current startup sequence needs three separate commands in separate terminals:
+— your current startup sequence needs three separate commands in separate terminals:
 
 1. **roscore**
 2. **rosserial** to connect Arduino
@@ -156,6 +156,9 @@ journalctl -u robot_autostart.service -b
 If you want, I can make you **a single launch file that starts roscore, rosserial, and keyboard control** and also **waits until Arduino is connected** so it won’t crash during boot. That makes it fully hands-off — you just turn on your PC and it’s ready.
 
 Do you want me to make that version?
+
+
+
 You *can* put just
 
 ```bash
