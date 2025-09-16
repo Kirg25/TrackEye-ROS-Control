@@ -8,7 +8,7 @@ A **Final Year Project (2025)** by a Mechatronics student, integrating **Arduino
 
 ## 📁 Project Structure
 
-* **Arduino Code**: `Project_MEC3_25_3`
+* **Arduino Code**: `Project_MEC3_25_4`
 * **ROS Package**: `robot_control`
 
 ---
