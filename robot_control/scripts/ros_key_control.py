@@ -5,10 +5,13 @@ from pynput import keyboard
 
 def on_press(key):
     try:
-        k = key.char.upper()  # Convert key to uppercase
+        k = key.char.upper()
         if k == 'F':
             pub.publish("F")
             rospy.loginfo("Sent command: F (Forward)")
+        elif k == 'R':
+            pub.publish("R")
+            rospy.loginfo("Sent command: R (Reverse)")
         elif k == 'S':
             pub.publish("S")
             rospy.loginfo("Sent command: S (Stop)")
@@ -24,8 +27,7 @@ if __name__ == "__main__":
     rospy.init_node('keyboard_motor_control', anonymous=True)
     pub = rospy.Publisher('motor_command', String, queue_size=10)
 
-    print("Press F to move forward, S to stop, Q to quit (without pressing Enter).")
+    print("Press F = Forward, R = Reverse, S = Stop, Q = Quit.")
 
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
-
