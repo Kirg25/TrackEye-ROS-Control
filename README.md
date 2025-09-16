@@ -32,7 +32,7 @@ rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0 _baud:=57600
 ### 3. **Run the Keyboard Control Node**
 
 ```bash
-rosrun robot_control keyboard_control.py
+rosrun robot_control ros_key_control.py
 ```
 
 ---
