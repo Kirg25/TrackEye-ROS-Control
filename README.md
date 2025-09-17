@@ -8,7 +8,7 @@ A **Final Year Project (2025)** by a Mechatronics student, integrating **Arduino
 
 ## 📁 Project Structure
 
-* **Arduino Code**: `Project_MEC3_25_4`
+* **Arduino Code**: `Project_MEC3_25_5`
 * **ROS Package**: `robot_control`
 
 ---
@@ -32,7 +32,7 @@ rosrun rosserial_python serial_node.py _port:=/dev/ttyUSB0 _baud:=57600
 ### 3. **Run the Keyboard Control Node**
 
 ```bash
-rosrun robot_control ros_key_control.py
+rosrun robot_control ros_teleop_control.py
 ```
 
 ---
@@ -44,7 +44,7 @@ rosrun robot_control ros_key_control.py
 If the Python file does not execute, make sure it has execute permissions:
 
 ```bash
-chmod +x /home/<user>/catkin_ws/src/robot_control/scripts/send_motor_command.py
+chmod +x /home/<user>/catkin_ws/src/robot_control/scripts/ros_teleop_control.py
 ```
 
 Replace `<user>` with your actual username.
